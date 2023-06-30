@@ -68,32 +68,22 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             super(itemView);
             textItem = itemView.findViewById(R.id.txtItem);
             buttonDelete = itemView.findViewById(R.id.btnDelete);
-
+            dbHelper = new DBHelper(itemView.getContext());
             buttonDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
+                        TaskModel taskModel = dataList.get(position);
 
-                   TaskModel     dataPosition= dataList.get(position);
-                        boolean success =  dbHelper.deleteOne(dataList.get(position));
+                        boolean success = dbHelper.deleteOne(taskModel);
                         if (success) {
-                           addItem(dataPosition); // Add the new task to the adapter
-//                        recyclerView.scrollToPosition(0); // Scroll to the top of the list
-//                            Toast.makeText(getApplicationContext(), "Success: " + success, Toast.LENGTH_SHORT).show();
-
-
+                            dataList.remove(position);
+                            notifyItemRemoved(position);
+                            Toast.makeText(itemView.getContext(), "Task deleted", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(itemView.getContext(), "Failed to delete task", Toast.LENGTH_SHORT).show();
                         }
-                        dbHelper.deleteOne(dataList.get(position));
-                        dataList.remove(position);
-                        notifyItemRemoved(position);
-
-
-//
-//                        dataList.remove(position);
-//                        notifyItemRemoved(position);
-//                        notifyItemRangeChanged(position, dataList.size());
-
                     }
                 }
             });

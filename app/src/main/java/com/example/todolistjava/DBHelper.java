@@ -14,46 +14,59 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DBHelper extends SQLiteOpenHelper {
-    public static final String TASK_TABLE = "TASK_TABLE";
-    public static final String COLUMN_TODO_TASK = " TODO_TASK TEXT ";
-    public static final String COLUMN_ID = "ID INTEGER";
+    // Database information
+    public static final String TASK_TODO_DB = "TaskTodo.db";
+    public static final int DATABASE_VERSION  = 1;
+    // Table name and column names
+    public static final String TABLE_TASK = "TASK_TABLE";
+    public static final String COLUMN_ID = "ID";
+    public static final String COLUMN_TODO_TASK = "TODO_TASK";
+
+    //Create table query
+    public static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_TASK + "(" + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT , " + COLUMN_TODO_TASK + " TEXT)";
+
+
 
     public DBHelper(@Nullable Context context) {
-        super(context, "TaskTodo.db", null, 1);
+        super(context, TASK_TODO_DB, null, DATABASE_VERSION );
     }
 
 
     @Override
+
     public void onCreate(SQLiteDatabase db) {
-//        String createTableStatement = "CREATE TABLE " + TASK_TABLE + " (" + COLUMN_ID + " PRIMARY KEY AUTOINCREMENT," + COLUMN_TODO_TASK + ")";
-        String createTableStatement = "CREATE TABLE TASK_TABLE(ID INTEGER PRIMARY KEY AUTOINCREMENT , TODO_TASK TEXT)";
-        db.execSQL(createTableStatement);
+        db.execSQL(CREATE_TABLE_STATEMENT);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        // Drop the table if it exists
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TASK);
+        onCreate(db);
     }
+    // CRUD operations
 
+    // Create operation
     public boolean addOne(TaskModel taskModel) {
         SQLiteDatabase db = this.getWritableDatabase();
 //        Content values stores data in pairs
         ContentValues cv = new ContentValues();
 //               "name"    ,   value
-        cv.put("TODO_TASK", taskModel.getTodoTask());
+        cv.put(COLUMN_TODO_TASK, taskModel.getTodoTask());
 
-        long insert = db.insert(TASK_TABLE, null, cv);
-        if (insert == -1) {
+        long insert = db.insert(TABLE_TASK, null, cv);
+        if (insert == -1 ) {
             return false;
         } else {
             return true;
         }
     }
 
+    // Read operation
     public  List<TaskModel> getAllTask() {
         List<TaskModel> dataList = new ArrayList<>();
 
-        String queryString = "SELECT * FROM TASK_TABLE ORDER BY ID DESC ";
+        String queryString = "SELECT * FROM " + TABLE_TASK + " ORDER BY " + COLUMN_ID + " DESC ";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(queryString,null);
@@ -61,7 +74,7 @@ public class DBHelper extends SQLiteOpenHelper {
 //      Loop through the cursor (result set ) and create new task. Put them in the return list
             do {
                 int taskID = cursor.getInt(0);
-                String taskTodo = cursor.getString(1);
+                String taskTodo = cursor.getString(DATABASE_VERSION );
 
                 TaskModel newTask = new TaskModel(taskID, taskTodo);
                 dataList.add(newTask);
@@ -75,16 +88,12 @@ public class DBHelper extends SQLiteOpenHelper {
         return dataList;
     }
 
+
+    // Delete operation
     public boolean deleteOne(TaskModel taskModel){
         SQLiteDatabase db = this.getWritableDatabase();
-//        Content values stores data in pairs
-        String queryString = "DELETE FROM TASK_TABLE WHERE ID = "+taskModel.getId();
-
-        Cursor cursor = db.rawQuery(queryString, null);
-        if (cursor.moveToFirst()){
-            return true;
-        }else {
-            return false;
-        }
+        String[] whereArgs = {String.valueOf(taskModel.getId())};
+        int rowsDeleted = db.delete(TABLE_TASK, COLUMN_ID + " = ?", whereArgs);
+        return rowsDeleted > 0;
     }
 }
