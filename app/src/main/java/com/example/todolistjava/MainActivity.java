@@ -40,9 +40,10 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.Refresh
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        dbHelper = new DBHelper(MainActivity.this);
+        dbHelper = new DBHelper(this);
 
         List<TaskModel> dataList = dbHelper.getAllTask();
+        adapter = new MyAdapter(dataList,dbHelper);
         buttonAdd = findViewById(R.id.btnAdd);
         editInput = findViewById(R.id.edtInput);
 
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.Refresh
 //        List<String> dataList = createTestData(); // Create test data
 
         recyclerView = findViewById(R.id.recyclerView);
-        adapter = new MyAdapter(dataList);
+
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -75,8 +76,9 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.Refresh
                     if (success) {
                         adapter.addItem(newItem); // Add the new task to the adapter
 //                        recyclerView.scrollToPosition(0); // Scroll to the top of the list
-                        Toast.makeText(getApplicationContext(), "Success: " + success, Toast.LENGTH_SHORT).show();
 
+                        Toast.makeText(getApplicationContext(), "Success: " + success, Toast.LENGTH_SHORT).show();
+                        Log.e("ADD", "onClick: "+newItem );
 
                     }
 

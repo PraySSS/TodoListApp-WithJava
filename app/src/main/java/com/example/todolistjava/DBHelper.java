@@ -72,9 +72,14 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(queryString,null);
         if (cursor.moveToFirst()) {
 //      Loop through the cursor (result set ) and create new task. Put them in the return list
+            int columnIndexId = cursor.getColumnIndexOrThrow(COLUMN_ID);
+            int columnIndexTodoTask = cursor.getColumnIndexOrThrow(COLUMN_TODO_TASK);
             do {
-                int taskID = cursor.getInt(0);
-                String taskTodo = cursor.getString(DATABASE_VERSION );
+//                int taskID = cursor.getInt(0);
+//                String taskTodo = cursor.getString(1 );
+                int taskID = cursor.getInt(columnIndexId);
+                String taskTodo = cursor.getString(columnIndexTodoTask);
+
 
                 TaskModel newTask = new TaskModel(taskID, taskTodo);
                 dataList.add(newTask);

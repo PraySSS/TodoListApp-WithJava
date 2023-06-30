@@ -1,6 +1,7 @@
 package com.example.todolistjava;
 
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +16,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private List<TaskModel> dataList;
     private RefreshListener refreshListener;
     private DBHelper dbHelper;
-    public MyAdapter(List<TaskModel> dataList) {
+    public MyAdapter(List<TaskModel> dataList, DBHelper dbHelper) {
         this.dataList = dataList;
+        this.dbHelper = dbHelper;
     }
 
     public void setRefreshListener(RefreshListener listener) {
@@ -69,20 +71,23 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             textItem = itemView.findViewById(R.id.txtItem);
             buttonDelete = itemView.findViewById(R.id.btnDelete);
             dbHelper = new DBHelper(itemView.getContext());
-            buttonDelete.setOnClickListener(new View.OnClickListener() {
+           buttonDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
-                        TaskModel taskModel = dataList.get(position);
 
+
+                        TaskModel taskModel = dataList.get(position);
                         boolean success = dbHelper.deleteOne(taskModel);
                         if (success) {
                             dataList.remove(position);
                             notifyItemRemoved(position);
                             Toast.makeText(itemView.getContext(), "Task deleted", Toast.LENGTH_SHORT).show();
+                            Log.e("DELETE", "onClick: "+position);
                         } else {
                             Toast.makeText(itemView.getContext(), "Failed to delete task", Toast.LENGTH_SHORT).show();
+                            Log.e("DELETE", "onClick: "+position);
                         }
                     }
                 }
