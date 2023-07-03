@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         recyclerView = findViewById(R.id.recyclerView);
-
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -78,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("ADD", "onClick Success Add: " + newItem);
 
                     } else {
-                        Toast.makeText(getApplicationContext(), "Add new task Unsuccess " , Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Add new task Unsuccessful " , Toast.LENGTH_SHORT).show();
                         Log.e("ADD", "onClick Unsuccessful Add: " + newItem);
                     }
 

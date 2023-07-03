@@ -21,11 +21,11 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edtInput"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:height="48dp"
             android:hint="Task to be done."
             android:inputType="text"
-            android:textColorHint="#546E7A" />
+            android:textColorHint="#8D6E63" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.appcompat.widget.AppCompatButton
@@ -46,13 +46,15 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="600dp"
+        android:layout_height="550dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/btnAdd"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/textInputLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
-        app:layout_constraintVertical_bias="0.604" />
+        app:layout_constraintVertical_bias="0.359" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
