@@ -9,6 +9,7 @@ public class TaskModel {
         this.todoTask = todoTask;
     }
 
+//    To make the TaskModel readable when we want to log the variable
     @Override
     public String toString() {
         return "TaskModel{" +

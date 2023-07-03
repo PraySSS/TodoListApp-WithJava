@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Layout;
 import android.util.Log;
@@ -23,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MyAdapter.RefreshListener {
-//public class MainActivity extends AppCompatActivity {
+//public class MainActivity extends AppCompatActivity implements MyAdapter.RefreshListener {
+public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private Button buttonAdd;
@@ -34,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.Refresh
     private MyAdapter adapter;
 
     DBHelper dbHelper;
-//    List<String> dataList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +43,10 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.Refresh
         dbHelper = new DBHelper(this);
 
         List<TaskModel> dataList = dbHelper.getAllTask();
-        adapter = new MyAdapter(dataList,dbHelper);
+        adapter = new MyAdapter(dataList, dbHelper);
         buttonAdd = findViewById(R.id.btnAdd);
         editInput = findViewById(R.id.edtInput);
 
-
-//        List<String> dataList = createTestData(); // Create test data
 
         recyclerView = findViewById(R.id.recyclerView);
 
@@ -58,8 +56,6 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.Refresh
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TaskModel taskModel;
-
                 Log.e("Button Add", "onClick: " + editInput.getText().toString());
 
 
@@ -70,50 +66,39 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.Refresh
                     // Display an error message or provide feedback to the user
                     Toast.makeText(getApplicationContext(), "Please enter some text", Toast.LENGTH_SHORT).show();
                 } else {
+//                    Set the data before send to database
                     TaskModel newItem = new TaskModel(-1, text);
 //                    Add data to SQLite
                     boolean success = dbHelper.addOne(newItem);
+
                     if (success) {
                         adapter.addItem(newItem); // Add the new task to the adapter
-//                        recyclerView.scrollToPosition(0); // Scroll to the top of the list
 
-                        Toast.makeText(getApplicationContext(), "Success: " + success, Toast.LENGTH_SHORT).show();
-                        Log.e("ADD", "onClick: "+newItem );
+                        Toast.makeText(getApplicationContext(), "Add new task Success", Toast.LENGTH_SHORT).show();
+                        Log.e("ADD", "onClick Success Add: " + newItem);
 
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Add new task Unsuccess " , Toast.LENGTH_SHORT).show();
+                        Log.e("ADD", "onClick Unsuccessful Add: " + newItem);
                     }
 
-//                    try {
-//
-////                        ArrayAdapter taskArrayAdapter = new ArrayAdapter<TaskModel>(MainActivity.this, android.R.layout.simple_list_item_1, allTask);
-////                        recyclerView.setAdapter(taskArrayAdapter);
-//                        taskModel = new TaskModel(-1, text);
-//                        boolean success = dbHelper.addOne(taskModel);
-//                        adapter.addItem(taskModel);
-//                        dbHelper.getAllTask();
-////                        int newPosition = adapter.getItemCount() - 1;
-////                        adapter.notifyItemInserted(newPosition);
-//                        Toast.makeText(getApplicationContext(), "Success: " + success, Toast.LENGTH_SHORT).show();
-//
-//                    } catch (Exception e) {
-//                        Toast.makeText(getApplicationContext(), "Error creating task", Toast.LENGTH_SHORT).show();
-//                        taskModel = new TaskModel(-1, "error");
-//                    }
-
-
-//                    adapter.notifyDataSetChanged();
                 }
 
 //                Set to hide keyboard and clear the field
                 editInput.getText().clear();
                 hideKeyboard();
+//                Make the Text input unfocused after clicked the button
                 editInput.setFocusable(false);
                 editInput.setFocusableInTouchMode(false);
-//                Set the field for use next time
+//                Set the field to can usable for next time
                 editInput.requestFocus();
                 editInput.setFocusable(true);
                 editInput.setFocusableInTouchMode(true);
-
-                startActivity(getIntent());
+//                To refresh the recyclerView
+//                Get the collection after add new data to database
+                List<TaskModel> updatedDataList = dbHelper.getAllTask(); // Retrieve updated data
+                adapter.setDataList(updatedDataList); // Update the adapter's data list
+                adapter.notifyDataSetChanged(); // Notify the adapter of the data change
             }
         });
 
@@ -121,12 +106,6 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.Refresh
     }
 
 
-    @Override
-    public void onRefresh() {
-        List<TaskModel> updatedDataList = dbHelper.getAllTask(); // Retrieve updated data
-        adapter.setDataList(updatedDataList); // Update the adapter's data list
-        adapter.notifyDataSetChanged(); // Notify the adapter of the data change
-    }
 
     private void hideKeyboard() {
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -136,23 +115,5 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.Refresh
         }
     }
 
-//      Mock Data
-//    private List<String> createTestData() {
-//        List<String> testData = new ArrayList<>();
-//        testData.add("Lorem ipsum dolor sit ametDonec sollicitudin velit ligula, vel placerat risus egestas non. Nulla diam risus, bibendum sit amet placerat in, pellentesque lacinia odio. Duis ut diam volutpat, pulvinar sapien at, consectetur est. Phasellus at malesuada libero. Proin sed luctus erat. Proin sapien purus, lobortis at lectus a, finibus vestibulum elit. Quisque ac nunc a metus vulputate hendrerit. Praesent a sem quam. Nulla imperdiet leo sit amet mi posuere blandit. Nam metus libero, tincidunt nec meo sapien, sit amet placerat m.");
-//        testData.add("Item 2");
-//        testData.add("Item 3");
-//        testData.add("Item 4");
-//        testData.add("Item 5");
-//        testData.add("Item 6");
-//        testData.add("Item 7");
-//        testData.add("Item 8");
-//        // Add more test data as needed
-//
-//        // Sort the testData list in descending order
-//        Collections.sort(testData, Collections.reverseOrder());
-//
-//        return testData;
-//    }
 
 }

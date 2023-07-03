@@ -22,7 +22,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ID = "ID";
     public static final String COLUMN_TODO_TASK = "TODO_TASK";
 
-    //Create table query
+    //Create table query                                                                                    Increase the ID when add new item
     public static final String CREATE_TABLE_STATEMENT = "CREATE TABLE " + TABLE_TASK + "(" + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT , " + COLUMN_TODO_TASK + " TEXT)";
 
 
@@ -36,7 +36,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_STATEMENT);
-    }
+    }// Execute the file
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -44,8 +44,8 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TASK);
         onCreate(db);
     }
-    // CRUD operations
 
+    // CRUD operations
     // Create operation
     public boolean addOne(TaskModel taskModel) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -55,6 +55,7 @@ public class DBHelper extends SQLiteOpenHelper {
         cv.put(COLUMN_TODO_TASK, taskModel.getTodoTask());
 
         long insert = db.insert(TABLE_TASK, null, cv);
+//        SQLite send -1 if it got an error
         if (insert == -1 ) {
             return false;
         } else {
@@ -65,40 +66,50 @@ public class DBHelper extends SQLiteOpenHelper {
     // Read operation
     public  List<TaskModel> getAllTask() {
         List<TaskModel> dataList = new ArrayList<>();
-
+//        Select data and sort it in descending order
         String queryString = "SELECT * FROM " + TABLE_TASK + " ORDER BY " + COLUMN_ID + " DESC ";
-
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(queryString,null);
-        if (cursor.moveToFirst()) {
+        Cursor cursor = null;
+
+        try {
+            cursor = db.rawQuery(queryString, null);
+            if (cursor.moveToFirst()) {
 //      Loop through the cursor (result set ) and create new task. Put them in the return list
-            int columnIndexId = cursor.getColumnIndexOrThrow(COLUMN_ID);
-            int columnIndexTodoTask = cursor.getColumnIndexOrThrow(COLUMN_TODO_TASK);
-            do {
-//                int taskID = cursor.getInt(0);
-//                String taskTodo = cursor.getString(1 );
-                int taskID = cursor.getInt(columnIndexId);
-                String taskTodo = cursor.getString(columnIndexTodoTask);
+                int columnIndexId = cursor.getColumnIndexOrThrow(COLUMN_ID);
+                int columnIndexTodoTask = cursor.getColumnIndexOrThrow(COLUMN_TODO_TASK);
+                do {
+//                Retrieve task ID and task description from the cursor
+                    int taskID = cursor.getInt(columnIndexId);
+                    String taskTodo = cursor.getString(columnIndexTodoTask);
 
+//                Create a new TaskModel object and add it to the list
+                    TaskModel newTask = new TaskModel(taskID, taskTodo);
+                    dataList.add(newTask);
 
-                TaskModel newTask = new TaskModel(taskID, taskTodo);
-                dataList.add(newTask);
-            } while (cursor.moveToNext());
-        } else {
-//      Failure. Don't add anything to the list.
+                } while (cursor.moveToNext());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+//            Close cursor and db when done
+            if(cursor!=null){
+                cursor.close();
+            }
+            db.close();
         }
-//        Close cursor and db when done
-        cursor.close();
-        db.close();
-        return dataList;
-    }
 
+            return dataList;
+
+    }
 
     // Delete operation
     public boolean deleteOne(TaskModel taskModel){
         SQLiteDatabase db = this.getWritableDatabase();
+//        This is used to specify the condition for the deletion in the SQL query.
         String[] whereArgs = {String.valueOf(taskModel.getId())};
+//        The ? acts as a placeholder for the value in the whereArgs array.
         int rowsDeleted = db.delete(TABLE_TASK, COLUMN_ID + " = ?", whereArgs);
+//        It checks if rowsDeleted is greater than 0, meaning that one or more rows were deleted successfully.
         return rowsDeleted > 0;
     }
 }
